@@ -159,7 +159,14 @@ class _IRContentAttachment extends _IRContent {
     }
 
     String fnSuffix = '';
-    if ((filename ?? '').isNotEmpty) fnSuffix = '; filename="$filename"';
+    if ((filename ?? '').isNotEmpty) {
+      if (filename.contains(RegExp(r'[^\x20-\x7E]'))) {
+        var tmpFilename = Uri.encodeComponent(filename);
+        fnSuffix = "; filename*=utf-8''$tmpFilename";
+      } else {
+        fnSuffix = '; filename=$filename';
+      }
+    }
     _header.add(_IRHeaderText('content-disposition',
         '${_describeEnum(_attachment.location)}$fnSuffix'));
   }
